@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { BuyList } from "./(tabs)/buyList";
+import List from "./(tabs)/buyList";
 
 export default function Index() {
   return (
@@ -10,7 +10,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <BuyList />     
+      <List />     
     </View>
   );
 }
