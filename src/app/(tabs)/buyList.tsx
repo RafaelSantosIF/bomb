@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import BuyList from "../../components/BuyList";
 import { colors, spacing } from "../../constants/theme";
@@ -12,37 +13,73 @@ type BuyItem = {
   completed: boolean;
 };
 
-type BuyListProps = {
-  list: BuyItem[];
-  list2: BuyItem[];
-};
-
 const list: BuyItem[] = [
     { id: '1', name: 'Arroz', quantity: 5, unit: 'kg', completed: false },
     { id: '2', name: 'Feijão', quantity: 3, unit: 'kg', completed: false },
     { id: '3', name: 'Macarrão', quantity: 2, unit: 'pct', completed: false },
+    
   ]; 
 
-const list2: BuyItem[] = [];
-
 export default function List() {
-  if (list.length === 0 && list2.length === 0) {
+  const [items, setItems] = useState<BuyItem[]>(list);
+
+  function toggleItem(id: string) {
+    setItems(currentItems =>
+      currentItems.map(item =>
+        item.id === id
+          ? { ...item, completed: !item.completed }
+          : item
+      )
+    );
+  }
+
+  function removeItem(id: string) {
+    setItems(currentItems =>
+      currentItems.filter(item => item.id !== id)
+    );
+  }
+
+  const pendingItems = items.filter(item => !item.completed);
+  const completedItems = items.filter(item => item.completed);
+  
+  if (items.length === 0) {
       return (
+        <View style={styles.container}>
+          <Text style={styles.sectionRotule}>MINHA LISTA</Text>
+          <Text style={styles.title}>{listTitle}</Text>
           <View style={styles.container2}>
               <Image source={require('../../../assets/images/cart.png')} style={styles.image} />
               <Text style={styles.title2}>Nada na lista ainda</Text>
               <Text style={styles.text}>Escreva o primeiro item na barra abaixo. Fica salvo no aparelho, mesmo sem internet!</Text>
-          </View>     
+          </View>  
+        </View>             
       );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionRotule}>Minha Lista</Text>
+      <Text style={styles.sectionRotule}>MINHA LISTA</Text>
       <Text style={styles.title}>{listTitle}</Text>
-      <BuyList list={list} />
-      <BuyList list={list2} />
-    </View>
+
+      <BuyList
+        list={pendingItems}
+        onToggle={toggleItem}
+        onRemove={removeItem}
+      />
+
+      <View style={styles.inCart}>
+        <Text style={styles.completedTitle}>
+          NO CARRINHO - {completedItems.length}
+        </Text>
+        <View style={styles.line} />
+      </View>
+
+      <BuyList
+        list={completedItems}
+        onToggle={toggleItem}
+        onRemove={removeItem}
+      />
+    </View>    
   );
 }
 
@@ -68,7 +105,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.bg
+    backgroundColor: colors.bg,
+    marginBottom: 60,
   },
   image: {
     width: 100,
@@ -84,7 +122,8 @@ const styles = StyleSheet.create({
   sectionRotule: {
     fontSize: 14,
     fontWeight: 400,
-    color: colors.acc
+    color: colors.acc,
+    fontFamily: 'monospace',
   },
   title2: {
     fontSize: 25,
@@ -99,4 +138,26 @@ const styles = StyleSheet.create({
     color: colors.text2,
     textAlign: 'center',
   },
+  inCart: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  completedTitle: {
+    fontSize: 14,
+    fontWeight: 700,
+    color: colors.border,
+    marginRight: spacing.sm,   
+  },
+  line: {
+    borderBottomColor: colors.border,
+    borderBottomWidth: 3,    
+    marginVertical: 0,
+    flex: 1,  
+  },
 });
+
+export type { BuyItem };
+

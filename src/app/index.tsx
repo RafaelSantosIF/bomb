@@ -8,6 +8,8 @@ export default function Index() {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        height: '100%',        
+        backgroundColor: '#A3E635',
       }}
     >
       <List />     

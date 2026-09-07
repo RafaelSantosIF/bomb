@@ -1,34 +1,37 @@
-import { useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import type { BuyItem } from "../app/(tabs)/buyList";
 import { colors, spacing } from "../constants/theme";
 
-export default function BuyList({ list }: { list: { id: string; name: string; quantity: number; unit: string; completed: boolean }[] }) {  
-  const [listState, setList] = useState(list);    
+type BuyListProps = {
+  list: BuyItem[];
+  onToggle: (id: string) => void;
+  onRemove: (id: string) => void;
+};
+
+export default function BuyList({ list, onToggle, onRemove }: BuyListProps) {  
   return (
     <FlatList
-        data={listState}
-        renderItem={({ item }) => (
-            <View style={styles.itemCard}>
-                <Pressable
-                  style={[styles.checkbox, item.completed && styles.checkboxCompleted]}
-                  onPress={() => setList(currentList => currentList.map(listItem =>
-                    listItem.id === item.id
-                      ? { ...listItem, completed: !listItem.completed }
-                      : listItem
-                  ))}
-                >
-                  {item.completed && <Text style={styles.checkboxText}>✔</Text>}
-                </Pressable>                     
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemQuantity}>{item.quantity} {item.unit}</Text>
-                <Pressable
-                  style={styles.removeButton}
-                  onPress={() => setList(currentList => currentList.filter(listItem => listItem.id !== item.id))}
-                >
-                  <Text style={styles.removeButtonText}>X</Text>
-                </Pressable>
-            </View>
-            )}
+      data={list}
+      renderItem={({ item }) => (
+        <View style={styles.itemCard}>
+          <Pressable
+            style={[styles.checkbox, item.completed && styles.checkboxCompleted]}
+            onPress={() => onToggle(item.id)}
+          >
+            {item.completed && <Text style={styles.checkboxText}>✔</Text>}
+          </Pressable>
+
+          <Text style={styles.itemName}>{item.name}</Text>
+          <Text style={styles.itemQuantity}>{item.quantity} {item.unit}</Text>
+          
+          <Pressable
+            style={styles.removeButton}
+            onPress={() => onRemove(item.id)}
+          >
+            <Text style={styles.removeButtonText}>X</Text>
+          </Pressable>
+        </View>
+      )}
     />
   );
     
@@ -39,8 +42,8 @@ const styles = StyleSheet.create({
         width: 26,
         height: 26,
         borderWidth: 2,
-        borderColor: colors.text,
-        backgroundColor: colors.surface,
+        borderColor: colors.text2,
+        backgroundColor: colors.surface2,
         marginRight: 6,
         borderRadius: 999
       },
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: 400,
         color: colors.text2,
-        backgroundColor: colors.control,
+        backgroundColor: colors.surface,
         paddingHorizontal: spacing.sm,
         paddingVertical: spacing.xs,
         borderRadius: 6,
