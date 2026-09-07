@@ -1,33 +1,53 @@
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, spacing } from "../constants/theme";
 
 export default function BuyList() {
-    const list = [{ id: '1', name: 'Arroz', quantity: 5, unit: 'kg' }, { id: '2', name: 'Feijão', quantity: 3, unit: 'kg' }, { id: '3', name: 'Macarrão', quantity: 2, unit: 'pct' }];
+  const [list, setList] = useState([
+    { id: '1', name: 'Arroz', quantity: 5, unit: 'kg', completed: false },
+    { id: '2', name: 'Feijão', quantity: 3, unit: 'kg', completed: false },
+    { id: '3', name: 'Macarrão', quantity: 2, unit: 'pct', completed: false },
+  ]);
 
-    if (list.length == 0){
-        return (
-            <View style={styles.container}>
-                <Text style={styles.title}>Nada na lista ainda</Text>
-                <Text style={styles.text}>Escreva o primeiro item na barra abaixo. Fica salvo no aparelho, mesmo sem internet!</Text>
-            </View>        
-        );
-    }
+  const [list2, setList2] = useState([]);
+
+  if (list.length === 0 && list2.length === 0) {
+      return (
+          <View style={styles.container}>
+              <Image source={require('../../assets/images/cart.png')} style={styles.image} />
+              <Text style={styles.title}>Nada na lista ainda</Text>
+              <Text style={styles.text}>Escreva o primeiro item na barra abaixo. Fica salvo no aparelho, mesmo sem internet!</Text>
+          </View>        
+      );
+  }
     
-    return (
-        <FlatList
-            data={list}
-            renderItem={({ item }) => (
-                <View style={styles.itemCard}>
-                    <View style={styles.checkbox}></View>                     
-                    <Text style={styles.itemName}>{item.name}</Text>
-                    <Text style={styles.itemQuantity}>{item.quantity} {item.unit}</Text>
-                    <View style={styles.removeButton}>
-                        <Button onPress={() => list.splice(list.indexOf(item), 1)} title="X" color={colors.removeBg}/>
-                    </View>
-                </View>
-                )}
-        />
-    );
+  return (
+    <FlatList
+        data={list}
+        renderItem={({ item }) => (
+            <View style={styles.itemCard}>
+                <Pressable
+                  style={[styles.checkbox, item.completed && styles.checkboxCompleted]}
+                  onPress={() => setList(currentList => currentList.map(listItem =>
+                    listItem.id === item.id
+                      ? { ...listItem, completed: !listItem.completed }
+                      : listItem
+                  ))}
+                >
+                  {item.completed && <Text style={styles.checkboxText}>✔</Text>}
+                </Pressable>                     
+                <Text style={styles.itemName}>{item.name}</Text>
+                <Text style={styles.itemQuantity}>{item.quantity} {item.unit}</Text>
+                <Pressable
+                  style={styles.removeButton}
+                  onPress={() => setList(currentList => currentList.filter(listItem => listItem.id !== item.id))}
+                >
+                  <Text style={styles.removeButtonText}>X</Text>
+                </Pressable>
+            </View>
+            )}
+    />
+  );
     
 }
 
@@ -36,18 +56,31 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        width: '85%',  
+        textAlign: 'center',
+        width: '95%',  
+        alignSelf: 'center',
+        gap: spacing.sm,
+        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.sm,
+        backgroundColor: colors.bg
+      },
+      image: {
+        width: 100,
+        height: 100,
+        marginBottom: spacing.sm
       },
       title: {
         fontSize: 25,
         fontWeight: 700,
         color: colors.text,
+        textAlign: 'center',
         marginBottom: spacing.sm
       },
       text: {
         fontSize: 17,
         fontWeight: 400,
-        color: colors.text2
+        color: colors.text2,
+        textAlign: 'center',
       },
       checkbox: {
         width: 26,
@@ -58,9 +91,19 @@ const styles = StyleSheet.create({
         marginRight: 6,
         borderRadius: 999
       },
+      checkboxCompleted: {
+        backgroundColor: colors.acc,
+        borderColor: colors.acc,
+      },
+      checkboxText: {
+        color: '#000',
+        fontSize: 16,
+        fontWeight: '700',
+        textAlign: 'center',
+      },
       itemCard: {
         flexDirection: "row",
-        alignItems: "flex-start",
+        alignItems: "center",
         height: 64,
         width: '100%', 
         padding: 15,        
@@ -72,8 +115,7 @@ const styles = StyleSheet.create({
       itemName: {
         fontSize: 18,
         fontWeight: 400,
-        color: colors.text,
-        justifyContent: "space-between",
+        color: colors.text,        
       },
       itemQuantity: {
         fontSize: 17,
@@ -87,8 +129,18 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         justifyContent: 'flex-end',
       },
-      removeButton: {
-        marginLeft: 'auto',
+      removeButton: {        
+        padding: spacing.sm,
+        backgroundColor: colors.removeBg,
+        aspectRatio: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 8,
+      },
+      removeButtonText: {
         color: colors.remove,
+        fontSize: 22,
+        fontWeight: 500,
+        lineHeight: 10
       }
 });

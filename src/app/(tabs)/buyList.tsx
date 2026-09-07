@@ -2,11 +2,13 @@ import { StyleSheet, Text, View } from "react-native";
 import BuyList from "../../components/BuyList";
 import { colors, spacing } from "../../constants/theme";
 
+let listTitle = "Compras da Semana";
+
 export default function List() {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionRotule}>Minha Lista</Text>
-      <Text style={styles.title}>Compras da Semana</Text>
+      <Text style={styles.title}>{listTitle}</Text>
       <BuyList />
     </View>
   );
