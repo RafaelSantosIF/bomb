@@ -1,3 +1,4 @@
+import { Host, LinearProgressIndicator } from '@expo/ui/jetpack-compose';
 import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import BuyList from "../../components/BuyList";
@@ -16,8 +17,7 @@ type BuyItem = {
 const list: BuyItem[] = [
     { id: '1', name: 'Arroz', quantity: 5, unit: 'kg', completed: false },
     { id: '2', name: 'Feijão', quantity: 3, unit: 'kg', completed: false },
-    { id: '3', name: 'Macarrão', quantity: 2, unit: 'pct', completed: false },
-    
+    { id: '3', name: 'Macarrão', quantity: 2, unit: 'pct', completed: false }    
   ]; 
 
 export default function List() {
@@ -61,18 +61,42 @@ export default function List() {
       <Text style={styles.sectionRotule}>MINHA LISTA</Text>
       <Text style={styles.title}>{listTitle}</Text>
 
+      {completedItems.length > 0 && (
+        <View style={styles.progressBar}>
+          <View style={styles.progressLabels}>
+            <Text style={styles.progressText}>
+              {pendingItems.length} pendentes
+            </Text>
+            <Text style={styles.progressText}>
+              {completedItems.length} de {items.length} itens no carrinho
+            </Text>
+          </View>
+          <Host style={styles.progressTrack}>
+            <LinearProgressIndicator
+              progress={completedItems.length / items.length}
+              color={colors.acc}
+              trackColor={colors.surface}
+            />
+          </Host>
+        </View>
+      )}
+
+      {pendingItems.length > 0 && (
       <BuyList
         list={pendingItems}
         onToggle={toggleItem}
         onRemove={removeItem}
       />
+      )}
 
-      <View style={styles.inCart}>
-        <Text style={styles.completedTitle}>
-          NO CARRINHO - {completedItems.length}
-        </Text>
-        <View style={styles.line} />
-      </View>
+      {completedItems.length > 0 && (
+        <View style={styles.inCart}>
+          <Text style={styles.completedTitle}>
+            NO CARRINHO - {completedItems.length}
+          </Text>
+          <View style={styles.line} />
+        </View>
+      )}
 
       <BuyList
         list={completedItems}
@@ -148,14 +172,35 @@ const styles = StyleSheet.create({
   completedTitle: {
     fontSize: 14,
     fontWeight: 700,
-    color: colors.border,
+    color: colors.text3,
     marginRight: spacing.sm,   
   },
   line: {
-    borderBottomColor: colors.border,
+    borderBottomColor: colors.text3,
     borderBottomWidth: 3,    
     marginVertical: 0,
     flex: 1,  
+  },
+  progressBar: {
+    width: '100%',
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.xs,
+  },
+  progressLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: spacing.xs,
+  },
+  progressText: {
+    fontSize: 14,
+    fontWeight: 400,
+    color: colors.text2,
+  },
+  progressTrack: {
+    width: '100%',
+    height: 12,
   },
 });
 

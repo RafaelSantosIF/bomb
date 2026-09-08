@@ -11,9 +11,10 @@ type BuyListProps = {
 export default function BuyList({ list, onToggle, onRemove }: BuyListProps) {  
   return (
     <FlatList
+      style={{ flexGrow: 0 }}
       data={list}
       renderItem={({ item }) => (
-        <View style={styles.itemCard}>
+        <View style={[styles.itemCard, item.completed && styles.cardCompleted]}>
           <Pressable
             style={[styles.checkbox, item.completed && styles.checkboxCompleted]}
             onPress={() => onToggle(item.id)}
@@ -21,8 +22,12 @@ export default function BuyList({ list, onToggle, onRemove }: BuyListProps) {
             {item.completed && <Text style={styles.checkboxText}>✔</Text>}
           </Pressable>
 
-          <Text style={styles.itemName}>{item.name}</Text>
-          <Text style={styles.itemQuantity}>{item.quantity} {item.unit}</Text>
+          <Text style={[styles.itemName, item.completed && styles.cardCompleted]}>
+            {item.name}
+          </Text>
+          <Text style={[styles.itemQuantity, item.completed && styles.cardCompleted]}>
+            {item.quantity} {item.unit}
+          </Text>
           
           <Pressable
             style={styles.removeButton}
@@ -42,7 +47,7 @@ const styles = StyleSheet.create({
         width: 26,
         height: 26,
         borderWidth: 2,
-        borderColor: colors.text2,
+        borderColor: '#4B5058',
         backgroundColor: colors.surface2,
         marginRight: 6,
         borderRadius: 999
@@ -68,14 +73,20 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         gap: spacing.sm,
       },
+      cardCompleted: {
+        backgroundColor: colors.buy,
+        color: colors.text3,
+        textDecorationLine: 'line-through',
+      },
       itemName: {
         fontSize: 18,
         fontWeight: 400,
         color: colors.text,        
       },
       itemQuantity: {
-        fontSize: 17,
+        fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'monospace',
         color: colors.text2,
         backgroundColor: colors.surface,
         paddingHorizontal: spacing.sm,
