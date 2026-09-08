@@ -1,6 +1,13 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import type { BuyItem } from "../app/(tabs)/buyList";
 import { colors, spacing } from "../constants/theme";
+
+type BuyItem = {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  completed: boolean;
+};
 
 type BuyListProps = {
   list: BuyItem[];
@@ -111,3 +118,6 @@ const styles = StyleSheet.create({
         lineHeight: 10
       }
 });
+
+export type { BuyItem, BuyListProps };
+
