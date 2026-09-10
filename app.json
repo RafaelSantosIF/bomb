@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "bomb",
-    "slug": "bomb",
-    "version": "1.0.0",
+    "name": "compras",
+    "slug": "compras",
+    "version": "0.0.8",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "bomb",
@@ -15,10 +15,10 @@
       "adaptiveIcon": {
         "backgroundColor": "#141712",
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundImage": "./assets/images/icon.png",
         "monochromeImage": "./assets/images/icon.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.compras"
     },
     "web": {
       "output": "static",
@@ -34,7 +34,7 @@
           "resizeMode": "contain",
           "backgroundColor": "#141712",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#141712"
           }
         }
       ],
@@ -46,6 +46,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "386fd629-6023-423d-8b17-abdda85d181a"
+      }
     }
   }
 }
