@@ -1,18 +1,13 @@
-import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import List from "./(tabs)/buyList";
 
 export default function Index() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        height: '100%',        
-        backgroundColor: '#A3E635',
-      }}
+    <SafeAreaView
+      edges={["top", "left", "right"]}
+      style={{ flex: 1, backgroundColor: "#A3E635" }}
     >
-      <List />     
-    </View>
+      <List />
+    </SafeAreaView>
   );
 }

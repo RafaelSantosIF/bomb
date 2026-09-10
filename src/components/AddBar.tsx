@@ -1,21 +1,44 @@
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Keyboard, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import InputSpinner from "react-native-input-spinner";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, spacing } from "../constants/theme";
 import { BuyItem } from "./BuyList";
 
 type NewBuyItem = Omit<BuyItem, "id" | "completed">;
 
 type AddBarProps = {
+    active: boolean;
+    onActivate: () => void;
     onAdd: (item: NewBuyItem) => void;
 };
 
 const units = ["un", "kg", "cx", "pct"] as const;
 
-export default function AddBar({ onAdd }: AddBarProps) {
+export default function AddBar({ active, onActivate, onAdd }: AddBarProps) {
     const [name, setName] = useState("");
     const [quantity, setQuantity] = useState(1);
-    const [unit, setUnit] = useState<NewBuyItem["unit"] | null>(null);
+    const [unit, setUnit] = useState<NewBuyItem["unit"] | null>(null);    
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
+    const insets = useSafeAreaInsets();
+    const canAdd = Boolean(name.trim() && unit);
+
+    useEffect(() => {
+        const showEvent = Platform.OS === "ios" ? "keyboardWillChangeFrame" : "keyboardDidShow";
+        const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+        const showSubscription = Keyboard.addListener(showEvent, (event) => {
+            setKeyboardHeight(event.endCoordinates.height);
+        });
+        const hideSubscription = Keyboard.addListener(hideEvent, () => {
+            setKeyboardHeight(0);
+        });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
+    }, []);
 
     function addItem() {
         const trimmedName = name.trim();
@@ -31,57 +54,67 @@ export default function AddBar({ onAdd }: AddBarProps) {
     }
 
     return (
-        <View style={styles.container}>
+        <Pressable
+            style={[
+                styles.container,
+                active ? styles.activeContainer : styles.inactiveContainer,
+                { bottom: insets.bottom + keyboardHeight + 15 },
+            ]}
+            onPress={onActivate}
+        >
             <TextInput
                 style={styles.input}
                 onChangeText={setName}
+                onFocus={onActivate}
                 value={name}
                 placeholder="Novo item..."
                 placeholderTextColor={colors.text2}
             />
 
             <Pressable
-                style={[styles.addButton, (!name.trim() || !unit) && styles.disabledButton]}
+                style={[styles.addButton, canAdd ? styles.enabledAddButton : styles.disabledButton]}
                 onPress={addItem}
-                disabled={!name.trim() || !unit}
+                disabled={!canAdd}
             >
-                <Text style={styles.buttonText}>+</Text>
+                <Text style={[styles.buttonText, canAdd && styles.enabledButtonText]}>+</Text>
             </Pressable>
 
-            <View style={styles.secondRow}>
-                <InputSpinner
-                    style={styles.spinner}
-                    skin="square"
-                    rounded={true}
-                    max={99}
-                    min={1}
-                    step={1}
-                    colorRight={colors.surface2}
-                    colorLeft={colors.surface2}
-                    textColor={colors.text}
-                    background={colors.surface2}
-                    color={colors.surface2}
-                    colorAsBackground={true}                   
-                    inputStyle={styles.spinnerInput}
-                    value={quantity}
-                    onChange={(value) => setQuantity(Number(value))}
-                />
+            {active && (
+                <View style={styles.secondRow}>
+                    <InputSpinner
+                        style={styles.spinner}
+                        skin="square"
+                        rounded={true}
+                        max={99}
+                        min={1}
+                        step={1}
+                        colorRight={colors.surface2}
+                        colorLeft={colors.surface2}
+                        textColor={colors.text}
+                        background={colors.surface2}
+                        color={colors.surface2}
+                        colorAsBackground={true}
+                        inputStyle={styles.spinnerInput}
+                        value={quantity}
+                        onChange={(value) => setQuantity(Number(value))}
+                    />
 
-                <View style={styles.units}>
-                    {units.map((option) => (
-                        <Pressable
-                            key={option}
-                            style={[styles.unit, unit === option && styles.selectedUnit]}
-                            onPress={() => setUnit(option)}
-                        >
-                            <Text style={[styles.unitText, unit === option && styles.selectedUnitText]}>
-                                {option}
-                            </Text>
-                        </Pressable>
-                    ))}
+                    <View style={styles.units}>
+                        {units.map((option) => (
+                            <Pressable
+                                key={option}
+                                style={[styles.unit, unit === option && styles.selectedUnit]}
+                                onPress={() => setUnit(option)}
+                            >
+                                <Text style={[styles.unitText, unit === option && styles.selectedUnitText]}>
+                                    {option}
+                                </Text>
+                            </Pressable>
+                        ))}
+                    </View>
                 </View>
-            </View> 
-        </View>            
+            )}
+        </Pressable>
     );
 }
 
@@ -92,14 +125,12 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
         flexWrap: "wrap",
         left: 0,
-        right: 0,
-        bottom: 10,
+        right: 0,        
         marginLeft: 20,
         marginRight: 20,
         zIndex: 1,
-        height: 130,
+        height: 70,
         backgroundColor: colors.surface,
-        borderColor: colors.surface2,
         borderWidth: 2,
         borderRadius: 10,
         padding: spacing.sm,
@@ -108,6 +139,13 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: -3 },
         shadowOpacity: 0.25,
         shadowRadius: 5,
+    },
+    inactiveContainer: {
+        borderColor: colors.surface2,
+    },
+    activeContainer: {
+        height: 130,
+        borderColor: colors.acc,
     },
     input: {
         flex: 1,
@@ -166,6 +204,9 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
         alignItems: 'center',
     },
+    enabledAddButton: {
+        backgroundColor: colors.acc,
+    },
     disabledButton: {
         opacity: 0.45,
     },
@@ -174,5 +215,8 @@ const styles = StyleSheet.create({
         fontSize: 25,
         fontWeight: 700,
         lineHeight: 18
-    }
+    },
+    enabledButtonText: {
+        color: "#000",
+    },
 })

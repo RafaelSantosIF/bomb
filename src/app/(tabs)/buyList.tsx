@@ -1,7 +1,7 @@
 import AddBar from '@/src/components/AddBar';
 import { Host, LinearProgressIndicator } from '@expo/ui/jetpack-compose';
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import BuyList, { BuyItem } from "../../components/BuyList";
 import { colors, spacing } from "../../constants/theme";
 
@@ -14,6 +14,7 @@ const list: BuyItem[] = [
 
 export default function List() {
   const [items, setItems] = useState<BuyItem[]>(list);
+  const [addBarActive, setAddBarActive] = useState(false);
 
   function toggleItem(id: string) {
     setItems(currentItems =>
@@ -47,21 +48,33 @@ export default function List() {
   
   if (items.length === 0) {
       return (
-        <View style={styles.container}>
+        <>
+        <Pressable 
+          style={styles.container}
+          onPress={()=> setAddBarActive(false)}
+        >
           <Text style={styles.sectionRotule}>MINHA LISTA</Text>
           <Text style={styles.title}>{listTitle}</Text>
           <View style={styles.container2}>
               <Image source={require('../../../assets/images/cart.png')} style={styles.image} />
               <Text style={styles.title2}>Nada na lista ainda</Text>
               <Text style={styles.text}>Escreva o primeiro item na barra abaixo. Fica salvo no aparelho, mesmo sem internet!</Text>
-          </View>
-          <AddBar onAdd={addItem} />
-        </View>             
+          </View>          
+        </Pressable>
+        <AddBar
+            active={addBarActive}
+            onActivate={() => setAddBarActive(true)}
+            onAdd={addItem}
+        />
+        </>             
       );
   }
 
   return (
-    <View style={styles.container}>
+    <>
+    <Pressable style={styles.container}
+      onPress={()=> setAddBarActive(false)}
+    >
       <Text style={styles.sectionRotule}>MINHA LISTA</Text>
       <Text style={styles.title}>{listTitle}</Text>
 
@@ -109,8 +122,15 @@ export default function List() {
         onRemove={removeItem}
       />
 
-      <AddBar onAdd={addItem} />
-    </View>    
+    </Pressable>
+
+    <AddBar
+      active={addBarActive}
+      onActivate={() => setAddBarActive(true)}
+      onAdd={addItem}
+    />      
+
+    </>    
   );
 }
 
@@ -118,14 +138,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "flex-start",
-    alignItems: "flex-start",
-    marginTop: 40,  
+    alignItems: "flex-start",    
     backgroundColor: colors.bg,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     paddingBottom: 102,
-    width: '100%',
-    height: '100%',
+    width: '100%',    
     position: 'relative',    
   },
   container2: {
