@@ -65,7 +65,8 @@ export default function AddBar({ active, onActivate, onAdd }: AddBarProps) {
             <TextInput
                 style={styles.input}
                 onChangeText={setName}
-                onFocus={onActivate}
+                onPressIn={onActivate}
+                onFocus={onActivate}               
                 value={name}
                 placeholder="Novo item..."
                 placeholderTextColor={colors.text2}

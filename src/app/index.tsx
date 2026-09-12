@@ -1,5 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import List from "./(tabs)/buyList";
+import ListLib from "./(tabs)/listLib";
 
 export default function Index() {
   return (
@@ -7,7 +7,7 @@ export default function Index() {
       edges={["top", "left", "right"]}
       style={{ flex: 1, backgroundColor: "#A3E635" }}
     >
-      <List />
+      <ListLib />
     </SafeAreaView>
   );
 }

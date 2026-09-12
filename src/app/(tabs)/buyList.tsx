@@ -1,20 +1,36 @@
 import AddBar from '@/src/components/AddBar';
 import { Host, LinearProgressIndicator } from '@expo/ui/jetpack-compose';
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import BuyList, { BuyItem } from "../../components/BuyList";
 import { colors, spacing } from "../../constants/theme";
+import { saveListUpdate } from "../../hooks/listUpdates";
 
-let listTitle = "Compras da Semana";
-const list: BuyItem[] = [
-  { id: '1', name: 'Arroz', quantity: 5, unit: 'kg', completed: false },
-  { id: '2', name: 'Feijão', quantity: 3, unit: 'kg', completed: false },
-  { id: '3', name: 'Macarrão', quantity: 2, unit: 'pct', completed: false }    
-]; 
+const defaultListTitle = "Compras da Semana";
+function parseList(value: string | string[] | undefined): BuyItem[] {
+  if (!value || Array.isArray(value)) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 export default function List() {
-  const [items, setItems] = useState<BuyItem[]>(list);
+  const { listId: routeId, listTitle: routeTitle, list: routeList } = useLocalSearchParams<{
+    listId?: string;
+    listTitle?: string;
+    list?: string;
+  }>();
+  const [items, setItems] = useState<BuyItem[]>(() => parseList(routeList));
   const [addBarActive, setAddBarActive] = useState(false);
+  const listTitle = routeTitle || defaultListTitle;
 
   function toggleItem(id: string) {
     setItems(currentItems =>
@@ -45,16 +61,32 @@ export default function List() {
 
   const pendingItems = items.filter(item => !item.completed);
   const completedItems = items.filter(item => item.completed);
+
+  function goBack() {
+    if (routeId) {
+      saveListUpdate({ listId: routeId, values: items });
+    }
+
+    router.back();
+  }
   
   if (items.length === 0) {
       return (
-        <>
+        <SafeAreaView
+          edges={["top", "left", "right"]}
+          style={{ flex: 1, backgroundColor: colors.bg }}
+        >
         <Pressable 
           style={styles.container}
           onPress={()=> setAddBarActive(false)}
         >
           <Text style={styles.sectionRotule}>MINHA LISTA</Text>
-          <Text style={styles.title}>{listTitle}</Text>
+          <View style={styles.header}>
+            <Text style={styles.title}>{listTitle}</Text>
+            <Pressable onPress={goBack}>
+              <Image source={require('@/assets/images/voltar.png')} style={styles.backButton}/>
+            </Pressable>
+          </View>
           <View style={styles.container2}>
               <Image source={require('../../../assets/images/cart.png')} style={styles.image} />
               <Text style={styles.title2}>Nada na lista ainda</Text>
@@ -66,71 +98,79 @@ export default function List() {
             onActivate={() => setAddBarActive(true)}
             onAdd={addItem}
         />
-        </>             
+        </SafeAreaView>             
       );
   }
 
   return (
-    <>
-    <Pressable style={styles.container}
-      onPress={()=> setAddBarActive(false)}
+    <SafeAreaView
+      edges={["top", "left", "right"]}
+      style={{ flex: 1, backgroundColor: colors.bg }}
     >
-      <Text style={styles.sectionRotule}>MINHA LISTA</Text>
-      <Text style={styles.title}>{listTitle}</Text>
+      <Pressable style={styles.container}
+        onPress={()=> setAddBarActive(false)}
+      >
+        <Text style={styles.sectionRotule}>MINHA LISTA</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>{listTitle}</Text>
+          <Pressable onPress={goBack}>
+            <Image source={require('@/assets/images/voltar.png')} style={styles.backButton}/>
+          </Pressable>
+        </View>
 
-      {completedItems.length > 0 && (
-        <View style={styles.progressBar}>
-          <View style={styles.progressLabels}>
-            <Text style={styles.progressText}>
-              {pendingItems.length} pendentes
-            </Text>
-            <Text style={styles.progressText}>
-              {completedItems.length} de {items.length} itens no carrinho
-            </Text>
+        {completedItems.length > 0 && (
+          <View style={styles.progressBar}>
+            <View style={styles.progressLabels}>
+              <Text style={styles.progressText}>
+                {pendingItems.length} pendentes
+              </Text>
+              <Text style={styles.progressText}>
+                {completedItems.length} de {items.length} itens no carrinho
+              </Text>
+            </View>
+            <Host style={styles.progressTrack}>
+              <LinearProgressIndicator
+                progress={completedItems.length / items.length}
+                color={colors.acc}
+                trackColor={colors.surface}
+                drawStopIndicator={{stopSize: 0}}
+              />
+            </Host>          
           </View>
-          <Host style={styles.progressTrack}>
-            <LinearProgressIndicator
-              progress={completedItems.length / items.length}
-              color={colors.acc}
-              trackColor={colors.surface}
-              drawStopIndicator={{stopSize: 0}}
-            />
-          </Host>          
-        </View>
-      )}
+        )}
 
-      {pendingItems.length > 0 && (
-      <BuyList
-        list={pendingItems}
-        onToggle={toggleItem}
-        onRemove={removeItem}
-      />
-      )}
+        {pendingItems.length > 0 && (
+        <BuyList
+          list={pendingItems}
+          onToggle={toggleItem}
+          onRemove={removeItem}
+        />
+        )}
 
-      {completedItems.length > 0 && (
-        <View style={styles.inCart}>
-          <Text style={styles.completedTitle}>
-            NO CARRINHO - {completedItems.length}
-          </Text>
-          <View style={styles.line} />
-        </View>
-      )}
+        {completedItems.length > 0 && (
+          <View style={styles.inCart}>
+            <Text style={styles.completedTitle}>
+              NO CARRINHO - {completedItems.length}
+            </Text>
+            <View style={styles.line} />
+          </View>
+        )}
 
-      <BuyList
-        list={completedItems}
-        onToggle={toggleItem}
-        onRemove={removeItem}
-      />
+        <BuyList
+          list={completedItems}
+          onToggle={toggleItem}
+          onRemove={removeItem}
+        />
 
-    </Pressable>
+      </Pressable>
 
-    <AddBar
-      active={addBarActive}
-      onActivate={() => setAddBarActive(true)}
-      onAdd={addItem}
-    />      
+      <AddBar
+        active={addBarActive}
+        onActivate={() => setAddBarActive(true)}
+        onAdd={addItem}
+      />      
 
-    </>    
+    </SafeAreaView>    
   );
 }
 
@@ -168,7 +208,13 @@ const styles = StyleSheet.create({
     fontSize: 31,
     fontWeight: 700,
     color: colors.text,
-    marginBottom: spacing.md
+    marginBottom: spacing.md,
+    flex: 1,
+  },
+  header: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    width: "100%",
   },
   sectionRotule: {
     fontSize: 14,
@@ -229,4 +275,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 8,
   },
+  backButton: {
+    height: 30,
+    aspectRatio: 1,
+    marginLeft: 'auto'
+  }
 });
