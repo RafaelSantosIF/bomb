@@ -6,7 +6,7 @@ type BuyItem = {
   name: string;
   quantity: number;
   unit: string;
-  completed: boolean;
+  completed?: boolean;
 };
 
 type BuyListProps = {
@@ -29,7 +29,12 @@ export default function BuyList({ list, onToggle, onRemove }: BuyListProps) {
             {item.completed && <Text style={styles.checkboxText}>✔</Text>}
           </Pressable>
 
-          <Text style={[styles.itemName, item.completed && styles.cardCompleted]}>
+          <Text
+            style={[styles.itemName, item.completed && styles.cardCompleted]}
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+          >
             {item.name}
           </Text>
           <Text style={[styles.itemQuantity, item.completed && styles.cardCompleted]}>
@@ -72,7 +77,7 @@ const styles = StyleSheet.create({
       itemCard: {
         flexDirection: "row",
         alignItems: "center",
-        height: 64,
+        minHeight: 64,
         width: '100%', 
         padding: 15,        
         marginBottom: 15,
@@ -86,7 +91,11 @@ const styles = StyleSheet.create({
         textDecorationLine: 'line-through',
       },
       itemName: {
+        flex: 1,
+        minWidth: 0,
+        flexShrink: 1,
         fontSize: 18,
+        lineHeight: 22,
         fontWeight: 400,
         color: colors.text,        
       },

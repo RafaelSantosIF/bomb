@@ -70,6 +70,7 @@ export default function AddBar({ active, onActivate, onAdd }: AddBarProps) {
                 value={name}
                 placeholder="Novo item..."
                 placeholderTextColor={colors.text2}
+                maxLength={80}
             />
 
             <Pressable

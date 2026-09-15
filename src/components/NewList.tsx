@@ -40,7 +40,8 @@ export default function NewList({ active, onActivate, onDeactivate, onAdd }: New
         }
 
         onAdd(trimmedName);
-        setName("");        
+        setName("");
+                
     }
     
     return (
@@ -61,6 +62,7 @@ export default function NewList({ active, onActivate, onDeactivate, onAdd }: New
                 value={name}
                 placeholder="Nome da Lista"
                 placeholderTextColor={colors.text2}
+                maxLength={33}
             />
             <Pressable style={[styles.addButton, active && styles.activeAddButton]} onPress={addList} >
                 <Text style={[styles.buttonText, active && styles.activeButtonText]}>+</Text>

@@ -49,7 +49,7 @@ export default function AllLists ({lists, onRemove, onOpen}: ListsProps) {
                         onPress={() => onRemove(item.id)}
                     >
                     <Text style={styles.removeButtonText}>X</Text>
-                </Pressable>                   
+                    </Pressable>                   
                 </Pressable>                
             )}
         />

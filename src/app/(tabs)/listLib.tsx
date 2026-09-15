@@ -29,15 +29,26 @@ export default function ListLib() {
     );
 
     function addList(name: string) {
+        const newList: NewListType = {
+            id: `${Date.now()}`,
+            name,
+            completed: false,
+            values: [],
+        };
+
         setLists(currentLists => [
             ...currentLists,
-            {
-                id: `${Date.now()}`,
-                name,
-                completed: false,
-                values: [],
-            },
+            newList,
         ]);
+        
+        router.push({
+            pathname: "/buyList",
+            params: {
+                listId: newList.id,
+                listTitle: newList.name,
+                list: JSON.stringify(newList.values),
+            },
+        });
     }
 
     if (lists.length === 0) {
