@@ -44,3 +44,12 @@ Aplicativo desenvolvido por **Rafael dos Santos Sousa** para a disciplina de
 ### Itens marcados
 
 ![Itens marcados](assets/mvp/itens_marcados.jpeg)
+
+### Bibliota de Listas
+
+![Biblioteca vazia](assets/mvp/biblioteca_vazia.jpeg)
+![Biblioteca de listas](assets/mvp/biblioteca_listas.jpeg)
+
+### Itens persistem entre abas
+
+![Itens persistem](assets/mvp/itens_persistem.jpeg)
